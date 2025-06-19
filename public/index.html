@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>シンプルなチャットアプリ</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="chat-container">
+        <div id="messages"></div>
+        <form id="message-form">
+            <input type="text" id="message-input" placeholder="メッセージを入力...">
+            <button type="submit">送信</button>
+        </form>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io(); // サーバーに接続
+
+        const messagesDiv = document.getElementById('messages');
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+
+        // フォームが送信されたときの処理
+        messageForm.addEventListener('submit', (e) => {
+            e.preventDefault(); // ページの再読み込みを防ぐ
+            const message = messageInput.value;
+            if (message) {
+                socket.emit('chat message', message); // サーバーにメッセージを送信
+                messageInput.value = ''; // 入力欄をクリア
+            }
+        });
+
+        // サーバーからメッセージを受信したときの処理
+        socket.on('chat message', (msg) => {
+            const item = document.createElement('div');
+            item.textContent = msg;
+            messagesDiv.appendChild(item); // メッセージを表示領域に追加
+            messagesDiv.scrollTop = messagesDiv.scrollHeight; // スクロールを一番下へ
+        });
+    </script>
+</body>
+</html>
